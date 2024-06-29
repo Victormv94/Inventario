@@ -8,6 +8,7 @@ use App\Http\Requests\InventarioRequest;
 use DB;
 use Auth;
 use DataTables;
+use Session;
 
 
 class InventarioController extends Controller
@@ -41,8 +42,10 @@ class InventarioController extends Controller
         );
 
         if($product){
+            Session::flash('message-success', 'Producto agregado correctamente.');
             return redirect()->route('inventario');
         }else{
+            Session::flash('message-error', 'No se agrego el producto.');
             return redirect()->route('addInventario');
         }
     }
@@ -52,8 +55,8 @@ class InventarioController extends Controller
         return view('editInventario', compact('producto'));
     }
 
-    public function updateInventario(Request $request){
-        $product = DB::table('inventario')->update(
+    public function updateInventario(Request $request,$id){
+        $product = DB::table('inventario')->where('id',$id)->update(
             [
               'nombre' => $request['nombre'],
               'descripcion' => $request['descripcion'],
@@ -64,14 +67,17 @@ class InventarioController extends Controller
         );
 
         if($product){
+            Session::flash('message-success', 'Producto guardado correctamente.');
             return redirect()->route('inventario');
         }else{
-            return redirect()->route('addInventario');
+            Session::flash('message-error', 'No se guardo el producto.');
+            return redirect()->route('editInventario');
         }
     }
 
     public function deleteInventario(Request $request){
         $eliminar = DB::table('inventario')->where('id',$request['id'])->delete();
+        Session::flash('message-success', 'Producto eliminado correctamente.');
         return redirect()->route('inventario');
     }
 }
